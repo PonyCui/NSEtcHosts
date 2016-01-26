@@ -6,35 +6,23 @@
 //  Copyright (c) 2015年 PonyCui. All rights reserved.
 //
 
-#import "NSEtcHosts.h"
 #import <objc/runtime.h>
-
-#ifdef DEBUG
+#import "NSEtcHosts.h"
 
 static NSDictionary *ipTable;
-static NSMutableArray *requestStorager;
 
 @implementation NSURLRequest (NSEtcHosts)
 
 - (instancetype)NEH_initWithURL:(NSURL *)URL cachePolicy:(NSURLRequestCachePolicy)cachePolicy timeoutInterval:(NSTimeInterval)timeoutInterval {
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        requestStorager = [NSMutableArray array];
-    });
     if (URL.host != nil && URL.host.length && ipTable[URL.host] != nil) {
         NSString *myURLString = URL.absoluteString;
         myURLString = [myURLString
-                       stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@"//%@", URL.host]
-                       withString:[NSString stringWithFormat:@"//%@", ipTable[URL.host]]];
+            stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@"//%@", URL.host]
+                                      withString:[NSString stringWithFormat:@"//%@", ipTable[URL.host]]];
         NSURL *myURL = [NSURL URLWithString:myURLString];
-        NSMutableURLRequest *myRequest = [NSMutableURLRequest requestWithURL:myURL cachePolicy:cachePolicy timeoutInterval:timeoutInterval];
-        [requestStorager addObject:myRequest];
-        [myRequest setValue:URL.host forHTTPHeaderField:@"Host"];
-        return myRequest;
+        URL = myURL;
     }
-    else {
-        return [self NEH_initWithURL:URL cachePolicy:cachePolicy timeoutInterval:timeoutInterval];
-    }
+    return [self NEH_initWithURL:URL cachePolicy:cachePolicy timeoutInterval:timeoutInterval];
 }
 
 @end
@@ -56,5 +44,3 @@ static NSMutableArray *requestStorager;
 }
 
 @end
-
-#endif

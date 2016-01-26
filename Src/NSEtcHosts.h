@@ -8,8 +8,6 @@
 
 #import <Foundation/Foundation.h>
 
-#ifdef DEBUG
-
 /**
  *  @brief  Never use NSEtcHosts in Production.
  */
@@ -18,5 +16,3 @@
 + (void)addHost:(NSString *)host ipAddress:(NSString *)ipAddress;
 
 @end
-
-#endif
